@@ -1,0 +1,9 @@
+#!/bin/bash
+REVISION=$1
+
+BRANCH=$(svn-rev $REVISION | head -n 1 | sed 's/^Index: \(trunk\)\/.*$\|^Index: branches\/\([^/]\+\).*$/\1\2/')
+
+SHA=$(git svn find-rev r$REVISION $BRANCH)
+
+git cherry-pick-svn $SHA
+
