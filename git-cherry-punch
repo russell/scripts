@@ -1,9 +1,20 @@
 #!/bin/bash
 REVISION=$1
 
-BRANCH=$(svn-rev $REVISION | head -n 1 | sed 's/^Index: \(trunk\)\/.*$\|^Index: branches\/\([^/]\+\).*$/\1\2/')
+BRANCH=$(svn-rev $REVISION 2>/dev/null | head -n 1 | sed 's/^Index: \(trunk\)\/.*$\|^Index: branches\/\([^/]\+\).*$/\1\2/')
+if [ -z "$BRANCH" ] 
+then
+	echo "Failed to get SVN revision"; 
+	exit 1;
+fi
 
 SHA=$(git svn find-rev r$REVISION $BRANCH)
+if [ -z "$SHA" ] 
+then
+	echo "Failed to get Git SHA, try git svn fetch"; 
+	exit 1;
+fi
+
 
 git cherry-pick-svn $SHA
 
