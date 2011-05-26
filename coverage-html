@@ -1,0 +1,46 @@
+#!/bin/bash
+
+usage()
+{
+cat << EOF
+usage: $0 options <ref>
+
+Generate a HTML coverage report and launch browser.
+
+OPTIONS:
+   -h      Show this message
+   -v      Verbose
+EOF
+}
+
+while getopts “ht:v” OPTION
+do
+     case $OPTION in
+         h)
+             usage
+             exit 1
+             ;;
+         v)
+             VERBOSE=1
+             ;;
+         ?)
+             usage
+             exit
+             ;;
+     esac
+done
+shift $((OPTIND-1))
+
+REF="master.."
+if [ -n "$1" ]
+then
+    REF="$1"
+fi
+pushd `git rev-parse --show-toplevel` 1>/dev/null
+ARGS=""
+for FILE in $(git diff --name-only $REF) ; do
+    ARGS="${ARGS},${FILE}"
+done
+coverage html --include="$ARGS"
+gnome-open "./htmlcov/index.html"
+popd 1>/dev/null
