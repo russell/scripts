@@ -1,0 +1,9 @@
+#!/bin/bash
+
+LAYOUT=`setxkbmap -query | grep "dvorak"`
+if [[ $? -eq 0 ]]; then
+    setxkbmap us;
+else
+    setxkbmap dvorak;
+fi
+
