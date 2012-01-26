@@ -1,0 +1,49 @@
+#!/bin/bash
+
+name=""
+domain="home"
+ram="128"
+size="4"
+bridge="virbr0"
+preseed="http://10.42.10.1/squeeze.cfg"
+mirror="http://ftp.iinet.net.au/debian/debian"
+os="debiansqueeze"
+
+while getopts  "n:s:r:" flag
+do
+  case "$flag" in
+      n)
+	  name="$OPTARG"
+	  ;;
+      r)
+	  ram="$OPTARG"
+	  ;;
+      s)
+	  size="$OPTARG"
+	  ;;
+      *)
+	  echo $"Usage $(basename $0) -n <name> -s <size> -r <ram>"
+	  exit 1
+  esac
+done
+if [ -z "$name" ]
+then
+    echo "you must specify a name"
+    exit 1
+fi
+
+virt-install -n $name -r $ram --vcpus=1 \
+             --os-variant=$os \
+             --disk /var/lib/libvirt/images/$name.img,size=$size \
+             --noautoconsole \
+             --graphics vnc \
+             -w bridge=$bridge,model=virtio \
+             -l $mirror/dists/squeeze/main/installer-amd64/ \
+             -x "DEBIAN_FRONTEND=text console=ttyS0,115200 auto language=en console-keymaps-at/keymap=us country=AU locale=en_AU.UTF-8 DEBCONF_PRIORITY=critical preseed/url=$preseed hostname=$name domain=$domain"
+if [ $? -ne 0 ]
+then
+    echo "failed to kickoff virt-install"
+    exit 1
+fi
+
+virsh console $name
