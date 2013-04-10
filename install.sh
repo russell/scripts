@@ -1,5 +1,6 @@
 #!/bin/bash
 
+mkdir -p ~/bin
 
 for name in *; do
     target="$HOME/bin/$name"
