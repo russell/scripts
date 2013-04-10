@@ -1,6 +1,0 @@
-[submodule "git-meld"]
-	path = git-meld
-	url = git://github.com/wmanley/git-meld.git
-[submodule "willgit"]
-	path = willgit
-	url = git://gitorious.org/willgit/mainline.git/
