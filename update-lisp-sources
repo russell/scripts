@@ -1,2 +1,3 @@
 #!/bin/sh
-ln -fs ~/projects/lisp/* ~/.local/share/common-lisp/source
+ln -fs ~/.emacs.d/el-get/slime ~/.local/share/common-lisp/source/
+ln -fs ~/projects/lisp/* ~/.local/share/common-lisp/source/
