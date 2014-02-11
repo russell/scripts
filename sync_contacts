@@ -1,0 +1,6 @@
+#!/bin/bash
+
+. ~/.virtualenvs/ASynK/bin/activate
+
+cd ~/local/ASynK
+python asynk.py --op=sync --log=debug
