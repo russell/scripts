@@ -46,7 +46,8 @@ def get_hosts(dns_matching=[]):
             except:
                 log.debug("%s: Reverse lookup of %s failed." % (fqdn, private_ip))
                 pass
-        yield ','.join((fqdn, private_ip)), 'ecdsa-sha2-nistp256', key
+        yield ' '.join((','.join ((fqdn, private_ip)),
+                        'ecdsa-sha2-nistp256', key))
 
 
 if '__main__' == __name__:
