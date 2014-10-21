@@ -1,0 +1,65 @@
+#!/usr/bin/guile \
+-e main -s
+!#
+
+(use-modules (scsh syntax))
+(use-modules (scsh scsh))
+(use-modules (ice-9 popen))
+(use-modules (ice-9 rdelim))
+(use-modules (ice-9 getopt-long))
+(use-modules (srfi srfi-1))
+
+(define user "russell")
+(define home-dir "/home/russell")
+
+(define mbsync-enabled-file (string-append home-dir "/.mbsync_enable"))
+(define mbsync-lock-file (string-append home-dir "/.mbsync_lock"))
+(define mbsync-binary (string-append home-dir "/bin/mbsync"))
+
+(environ (list
+          (string-append "HOME=" home-dir)
+          (string-append "USER=" user)
+          (string-append "USERNAME=" user)))
+
+(define (run-mbsync verbose)
+  (dynamic-wind
+    (lambda () (open-file mbsync-lock-file "w"))
+    (lambda ()
+     (let ((mbsync-output (open-output-string))
+           (in-port (open-input-pipe (string-join
+                                      (list mbsync-binary "-a" "2>&1")))))
+       (let loop ((line (read-line in-port 'concat)))
+         (or (eof-object? line)
+             (begin
+               (display line (if verbose
+                                 (current-output-port)
+                                 mbsync-output))
+               (loop (read-line in-port 'concat)))))
+       (let ((ret (status:exit-val (close-pipe in-port))))
+         (when (> ret 1)
+           (display (get-output-string mbsync-output))))))
+    (lambda () (delete-file mbsync-lock-file))))
+
+(define (main args)
+  (let* ((option-spec '((help    (single-char #\h) (value #f))
+                        (verbose (single-char #\v) (value #f))))
+         (options (getopt-long args option-spec))
+         (help-wanted (option-ref options 'help #f))
+         (verbose (option-ref options 'verbose #f)))
+    (if help-wanted
+        (if help-wanted
+            (display "\
+check-mail [options]
+
+  -v, --vebose     Print mbsync output
+  -h, --help       Display this help
+"))
+        (begin
+          (unless (file-exists? mbsync-enabled-file)
+            (display "mbsync isn't enabled.\n")
+            (exit))
+
+          (when (file-exists? mbsync-lock-file)
+            (display "mbsync is already running.\n")
+            (exit))
+          (run-mbsync verbose)))))
