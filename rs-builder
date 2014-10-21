@@ -1,0 +1,2 @@
+#!/bin/bash
+sudo cowbuilder "$@" --basepath /var/cache/pbuilder/base-unstable-amd64.cow
