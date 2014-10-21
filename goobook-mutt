@@ -1,4 +1,0 @@
-#!/bin/bash
-command="$1"
-shift
-sort -k 1,1 -u <(goobook $command "$*") <(goobook -c ~/.goobookmrc $command "$*")
