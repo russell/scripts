@@ -1,5 +1,16 @@
 #!/usr/bin/python
 
+"""
+Example known_hosts.ini
+
+[known_hosts]
+url = http://puppetdb.mydomain.com:8080/v3/
+dns_matching =
+    mydomain.com$
+    home$
+ip_matching = ^(?!172.)
+
+"""
 from os import path
 import ConfigParser
 import logging
