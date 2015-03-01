@@ -2,13 +2,15 @@
 
 name=""
 domain="home"
-ram="128"
+ram="256"
 size="4"
 bridge="virbr0"
-mirror="http://mirror.aarnet.edu.au/pub/ubuntu/archive/"
-varent="natty"
-distro="ubuntu"
-while getopts  "n:v:d:s:r:" flag
+varent="sid"
+distro="debian"
+arch="amd64"
+flavor=""
+
+while getopts  "n:v:d:s:a:r:f:" flag
 do
   case "$flag" in
       n)
@@ -26,33 +28,70 @@ do
       s)
 	  size="$OPTARG"
 	  ;;
+      a)
+	  arch="$OPTARG"
+	  ;;
+      f)
+	  flavor="$OPTARG"
+	  ;;
       *)
-	  echo "Usage $(basename $0) -n <name> -s <size> -r <ram> -v <varent>"
+	  echo "Usage $(basename $0) -n <name> -s <size> -r <ram> -v <varent> -d <distro>"
 	  echo "varent examples: natty, oneiric"
+	  echo "distro examples: debian, ubuntu"
 	  exit 1
   esac
 done
+
 if [ -z "$name" ]
 then
     echo "you must specify a name"
     exit 1
 fi
 
-preseed="http://10.42.10.1/$varent.cfg"
+if [ -z "$flavor" ]
+then
+    flavor="$arch"
+else
+    flavor="$flavor-$arch"
+fi
+
+case "$distro" in
+    ubuntu)
+	mirror="http://au.archive.ubuntu.com/ubuntu"
+	;;
+    debian)
+	mirror="http://ftp.au.debian.org/debian"
+	;;
+    *)
+	echo "error, can't find mirror"
+	exit 1
+esac
+
+
+case "$os" in
+    debiansid)
+	osvariant="generic"
+	;;
+    *)
+	osvariant=$os
+esac
+
+preseed="http://192.168.122.1/$varent.cfg"
 os="$distro$varent"
 
 sudo virt-install -n $name -r $ram --vcpus=1 \
-    --os-variant=$os \
+    --os-variant=$osvariant \
     --disk /var/lib/libvirt/images/$name.img,size=$size \
     --noautoconsole \
     --graphics vnc \
     -w bridge=$bridge,model=virtio \
-    -l $mirror/dists/$varent/main/installer-amd64/ \
-    -x "DEBIAN_FRONTEND=text console=ttyS0,115200 auto language=en console-setup/ask_detect=false console-setup/modelcode=SKIP keyboard-configuration/layoutcode=us console-keymaps-at/keymap=us country=AU locale=en_AU.UTF-8 DEBCONF_PRIORITY=critical preseed/url=$preseed hostname=$name domain=$domain"
+    -l $mirror/dists/$varent/main/installer-$flavor/ \
+    -x "DEBIAN_FRONTEND=text console=ttyS0,115200 auto language=en console-setup/ask_detect=false console-setup/modelcode=SKIP keyboard-configuration/xkb-keymap=us keyboard-configuration/layoutcode=us console-keymaps-at/keymap=us country=AU locale=en_AU.UTF-8 DEBCONF_PRIORITY=critical preseed/url=$preseed hostname=$name domain=$domain"
+
 if [ $? -ne 0 ]
 then
     echo "failed to kickoff virt-install"
     exit 1
 fi
 
-virsh console $name
+sudo virsh console $name
