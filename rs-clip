@@ -1,0 +1,31 @@
+#!/bin/bash
+
+COPY=false
+PASTE=false
+
+if [ $1 == "copy" ]; then
+    COPY=true
+elif [ $1 == "paste" ]; then
+    PASTE=true
+else
+    echo "ERROR: Command ${1} isn't valid"
+    exit 1
+fi
+
+# Darwin
+if [[ $(uname) == "Darwin" ]]; then
+    if $COPY; then
+        pbcopy
+    elif $PASTE; then
+        pbpaste
+    fi
+fi
+
+# Linux
+if [[ $(uname) == "Linux" ]]; then
+    if $COPY; then
+        xclip -sel clip -i </dev/stdin
+    elif $PASTE; then
+        xclip -sel clip -o
+    fi
+fi
