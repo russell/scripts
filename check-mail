@@ -2,6 +2,10 @@
 -e main -s
 !#
 
+;; todo handle error lines
+;; Error: UIDVALIDITY of master changed (got 139, expected 131)
+
+
 (use-modules (scsh syntax))
 (use-modules (scsh scsh))
 (use-modules (ice-9 popen))

@@ -2,8 +2,9 @@
 
 LAYOUT=`setxkbmap -query | grep "dvorak"`
 if [[ $? -eq 0 ]]; then
-    setxkbmap us;
+  setxkbmap us;
+  xmodmap ~/.xmodmaprc
 else
-    setxkbmap dvorak;
+  setxkbmap dvorak;
+  xmodmap ~/.xmodmaprc
 fi
-
