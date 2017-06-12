@@ -1,11 +1,10 @@
 #!/bin/bash
-
 COPY=false
 PASTE=false
 
-if [ $1 == "copy" ]; then
+if [[ $1 == "copy" ]]; then
     COPY=true
-elif [ $1 == "paste" ]; then
+elif [[ $1 == "paste" ]]; then
     PASTE=true
 else
     echo "ERROR: Command ${1} isn't valid"
@@ -15,7 +14,7 @@ fi
 # Darwin
 if [[ $(uname) == "Darwin" ]]; then
     if $COPY; then
-        pbcopy
+        cat | pbcopy
     elif $PASTE; then
         pbpaste
     fi
@@ -24,7 +23,7 @@ fi
 # Linux
 if [[ $(uname) == "Linux" ]]; then
     if $COPY; then
-        xclip -sel clip -i </dev/stdin
+        cat | xclip -sel clip -i
     elif $PASTE; then
         xclip -sel clip -o
     fi
