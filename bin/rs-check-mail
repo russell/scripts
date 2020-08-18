@@ -1,3 +1,15 @@
 #!/bin/bash
 set -eou pipefail
 
+# Afew move files before syncing
+afew -m -v
+
+# Sync mail
+mbsync -a
+
+# Not much indexing
+notmuch new
+
+# Tag emails
+afew -a -t -v
+
