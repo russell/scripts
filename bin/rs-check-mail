@@ -1,15 +1,16 @@
 #!/bin/bash
 set -eou pipefail
 
+export PATH="$HOME/projects/afew/.direnv/python-3.8.5/bin/:$PATH"
+
 # Afew move files before syncing
-afew -m -v
+nice -n 20 afew -m -v
 
 # Sync mail
-mbsync -a
+nice -n 20 mbsync -a
 
 # Not much indexing
-notmuch new
+nice -n 20 notmuch new
 
 # Tag emails
-afew -a -t -v
-
+nice -n 20 afew -n -t -v
