@@ -1,7 +1,0 @@
-#!/bin/bash
-REVISION=$1
-PREVIOUS=$(($REVISION-1))
-
-REPOSITORY=$(git svn info | grep "Repository Root:" | cut -f3 -d ' ')
-
-svn diff -r $PREVIOUS:$REVISION $REPOSITORY
