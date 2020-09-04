@@ -1,45 +1,51 @@
-#!/bin/bash
+#!/bin/bash -x
 
 name=""
 domain="home"
-ram="256"
+ram="1024"
 size="4"
+network="default"
 bridge="virbr0"
 varent="sid"
 distro="debian"
 arch="amd64"
 flavor=""
 
-while getopts  "n:v:d:s:a:r:f:" flag
+ARGS=""
+
+while getopts  "n:v:d:s:a:r:f:b:" flag
 do
-  case "$flag" in
-      n)
-	  name="$OPTARG"
-	  ;;
-      v)
-	  varent="$OPTARG"
-	  ;;
-      d)
-	  distro="$OPTARG"
-	  ;;
-      r)
-	  ram="$OPTARG"
-	  ;;
-      s)
-	  size="$OPTARG"
-	  ;;
-      a)
-	  arch="$OPTARG"
-	  ;;
-      f)
-	  flavor="$OPTARG"
-	  ;;
-      *)
-	  echo "Usage $(basename $0) -n <name> -s <size> -r <ram> -v <varent> -d <distro>"
-	  echo "varent examples: natty, oneiric"
-	  echo "distro examples: debian, ubuntu"
-	  exit 1
-  esac
+    case "$flag" in
+        n)
+            name="$OPTARG"
+            ;;
+        v)
+            varent="$OPTARG"
+            ;;
+        d)
+            distro="$OPTARG"
+            ;;
+        b)
+            ARGS="$ARGS --network=bridge=${OPTARG},model=e1000"
+            ;;
+        r)
+            ram="$OPTARG"
+            ;;
+        s)
+            size="$OPTARG"
+            ;;
+        a)
+            arch="$OPTARG"
+            ;;
+        f)
+            flavor="$OPTARG"
+            ;;
+        *)
+            echo "Usage $(basename $0) -n <name> -s <size> -r <ram> -v <varent> -d <distro>"
+            echo "varent examples: natty, oneiric"
+            echo "distro examples: debian, ubuntu"
+            exit 1
+    esac
 done
 
 if [ -z "$name" ]
@@ -57,36 +63,46 @@ fi
 
 case "$distro" in
     ubuntu)
-	mirror="http://au.archive.ubuntu.com/ubuntu"
-	;;
+        mirror="http://au.archive.ubuntu.com/ubuntu"
+        ;;
     debian)
-	mirror="http://ftp.au.debian.org/debian"
-	;;
+        mirror="http://ftp.dk.debian.org/debian"
+        ;;
     *)
-	echo "error, can't find mirror"
-	exit 1
+        echo "error, can't find mirror"
+        exit 1
 esac
 
+os="$distro$varent"
 
 case "$os" in
     debiansid)
-	osvariant="generic"
-	;;
+        osvariant="linux"
+        ;;
+    ubuntutrusty)
+        osvariant="linux"
+        ;;
     *)
-	osvariant=$os
+        osvariant=$os
+        ;;
 esac
 
 preseed="http://192.168.122.1/$varent.cfg"
-os="$distro$varent"
 
-sudo virt-install -n $name -r $ram --vcpus=1 \
-    --os-variant=$osvariant \
-    --disk /var/lib/libvirt/images/$name.img,size=$size \
-    --noautoconsole \
-    --graphics vnc \
-    -w bridge=$bridge,model=virtio \
-    -l $mirror/dists/$varent/main/installer-$flavor/ \
-    -x "DEBIAN_FRONTEND=text console=ttyS0,115200 auto language=en console-setup/ask_detect=false console-setup/modelcode=SKIP keyboard-configuration/xkb-keymap=us keyboard-configuration/layoutcode=us console-keymaps-at/keymap=us country=AU locale=en_AU.UTF-8 DEBCONF_PRIORITY=critical preseed/url=$preseed hostname=$name domain=$domain"
+# --os-variant=$osvariant \
+    # DEBIAN_FRONTEND=text console=ttyS0,115200
+
+sudo virt-install --debug \
+     --name $name \
+     --memory $ram \
+     --vcpus=1 \
+     --disk /var/lib/libvirt/images/$name.qcow,size=$size,format=qcow2 \
+     --graphics vnc \
+     --noreboot \
+     --network=bridge=$bridge,model=e1000 \
+     $ARGS \
+     --location ${mirror}/dists/${varent}/main/installer-${flavor}/ \
+     --extra-args "auto language=en netcfg/choose_interface=ens3 keyboard-configuration/xkb-keymap=us keyboard-configuration/layoutcode=us console-keymaps-at/keymap=us country=AU locale=en_AU.UTF-8 DEBCONF_PRIORITY=critical preseed/url=$preseed hostname=$name domain=$domain"
 
 if [ $? -ne 0 ]
 then
@@ -94,4 +110,4 @@ then
     exit 1
 fi
 
-sudo virsh console $name
+# sudo virsh console $name
