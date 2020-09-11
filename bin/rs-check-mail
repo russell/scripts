@@ -8,7 +8,7 @@ export PATH="$HOME/projects/afew/.direnv/python-3.8.5/bin/:$PATH"
 nice -n 20 afew -m -v
 
 # Sync mail
-nice -n 20 mbsync -a -v
+nice -n 20 mbsync -a -V
 
 # Not much indexing
 nice -n 20 notmuch new
