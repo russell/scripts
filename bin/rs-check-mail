@@ -13,5 +13,9 @@ nice -n 20 mbsync -a -V
 # Not much indexing
 nice -n 20 notmuch new
 
-# Tag emails
+# Tag new emails
 nice -n 20 afew -n -t -v
+
+# Reprocess emails with the inbox tag, because they might have been
+# moved outside of this notmuch
+nice -n 20 afew -v -t tag:inbox
