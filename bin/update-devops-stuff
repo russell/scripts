@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -e
+
+# Install Qbec
+mkdir -p /tmp/qbec; curl -L https://github.com/splunk/qbec/releases/download/v0.12.5/qbec-linux-amd64.tar.gz | tar -xvzC /tmp/qbec; mv /tmp/qbec/qbec /tmp/qbec/jsonnet-qbec ~/bin; rm -r /tmp/qbec
+
+# Install Helm
+mkdir -p /tmp/helm; curl -L https://get.helm.sh/helm-v3.4.1-linux-amd64.tar.gz | tar -xvzC /tmp/helm; mv /tmp/helm/linux-amd64/helm ~/bin; rm -r /tmp/helm
+
+# Install kbld
+curl -L https://github.com/vmware-tanzu/carvel-kbld/releases/download/v0.27.0/kbld-linux-amd64 > ~/bin/kbld; chmod +x ~/bin/kbld
+
+# Install vendir
+curl -L https://github.com/vmware-tanzu/carvel-vendir/releases/download/v0.14.0/vendir-linux-amd64 > ~/bin/vendir; chmod +x ~/bin/vendir
