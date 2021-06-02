@@ -3,6 +3,7 @@ set -eou pipefail
 
 export PATH="/usr/local/bin/:$PATH"
 export PATH="$HOME/projects/afew/.direnv/python-3.8.5/bin/:$PATH"
+export PATH="$HOME/projects/afew/.direnv/python-3.9.1/bin/:$PATH"
 
 # Afew move files before syncing
 nice -n 20 afew -m -v
