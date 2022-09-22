@@ -9,7 +9,10 @@ export PATH="$HOME/projects/afew/.direnv/python-3.9.1/bin/:$PATH"
 nice -n 20 afew -m -v
 
 # Sync mail
-nice -n 20 mbsync -a -V
+if nice -n 20 mbsync -a -V; then
+    echo "There was an error with OpenSSL https://bbs.archlinux.org/viewtopic.php?id=253854"
+    echo "it has probably been fixed an this error swallowing can be removed."
+fi
 
 # Not much indexing
 nice -n 20 notmuch new
