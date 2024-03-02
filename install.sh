@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 mkdir -p ~/bin
-stow --dotfiles -t "${HOME}/bin" -v bin 
+stow bin

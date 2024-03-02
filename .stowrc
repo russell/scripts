@@ -1,0 +1,1 @@
+--dotfiles -t ${HOME}/bin -v
